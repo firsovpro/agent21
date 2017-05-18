@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>CRM Agent21</title>
+		<script src="//api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>		
+        <link rel="stylesheet" href="js/jquery/jquery.mobile-1.4.5.min.css" type="text/css" charset="utf-8" />
+    	<link rel="stylesheet" type="text/css" href="js/dhtmlx/codebase/skins/material/dhtmlx.css"/>
+        <link rel="stylesheet" href="font/fontawesome/css/font-awesome.min.css">        
+        
+    	<script language="Javascript" type="text/javascript" src="js/jquery/jquery.min.js"></script>
+    	<script language="Javascript" type="text/javascript" src="js/jquery/jquery.mobile-1.4.5.min.js"></script>
+        <script src="js/dhtmlx/codebase/dhtmlx.js"></script> 		
+        <script src="js/dhtmlx/dhtmlxgrid.js"></script> 		
+        <script src="js/smallspr.js"></script> 		
+        <link rel="stylesheet" href="css/main.css">        
+
+	</head>
+	<body>
+        <div data-role="page" id="page" class='page'>
+              <div data-role='header' data-position="fixed" >
+					<table style='width:100%'>
+						<tr>
+							<td style="white-space: nowrap;">
+								<% if (!user) { %>
+									<p>
+									<a href="/" class="menuItem">Home</a> | 
+									<a href="/#login" class="menuItem">Log In</a>
+									</p>
+								<% } else { %>
+									<p>
+									<a href="/" class="menuItem">Home</a> | 
+									<a href="/#account" class="menuItem">Account</a> | 
+									<a href="/#logout" class="menuItem">Log Out</a>
+									</p>
+								<% } %>
+							</td>
+							<% if (user) { %>
+							<td style='width:99%' class='mainMenu' >
+								<i class="fa fa-user fa6" aria-hidden="true" item="Пользователи"></i>
+								<i class="fa fa-address-card-o fa6" item="Персоны" aria-hidden="true"></i>
+								<i class="fa fa-map-o fa6" item="Обьекты" aria-hidden="true"></i>
+							</td>
+							<% }  %>
+						</tr>
+					</table>
+              </div>
+              <div data-role='content' class="content">
+					<%- body %>
+              </div>
+              <div data-role="footer" data-position="fixed">
+    Подвал
+              </div>
+        </div> 
+        <script src="js/reinit.js"></script> 		
+        
+	</body>
+</html>

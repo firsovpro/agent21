@@ -1,0 +1,51 @@
+<style type="text/css">
+    .gridDiv{
+        height:400px;
+    }
+div.gridbox_dhx_terrace.gridbox table.obj tr td {
+    border-color: #ccc;
+    border-width: 0 0 1px 0;
+    padding-right: 20px;
+    padding-left: 8px;
+}    
+
+div.gridbox_dhx_terrace.gridbox table.hdr td div.hdrcell {
+    padding-left: 0px; 
+}
+
+    .fa-6{
+        font-size:42px;
+    }
+</style>
+
+<table style="width:100%" >
+    <tr>
+        <td style='vertical-align:top;white-space: nowrap;padding:8px' class='tdLmenu'>
+            <div><a href='/#objects?opp=edit'><i class="fa fa-user-plus fa-6" aria-hidden="true"></i></a></div>
+            <div><a href='/#objects?opp=edit'><i class="fa fa-pencil-square-o fa-6" aria-hidden="true"></i></a></div>
+            <div><a href='/#objects?opp=edit'><i class="fa fa-check-square-o fa-6" aria-hidden="true"></i></a></div>
+            <div><a href='/#objects?opp=edit'><i class="fa fa-user-times fa-6" aria-hidden="true"></i></a></div>
+        </td>
+        <td style="width:99%;padding:8px">
+            <div name="gridDiv" id="gridDiv" class="gridDiv"></div>
+        </td>
+    </tr>
+</table>
+<script type="text/javascript" >
+    $('.fa-6').click(function(){
+        window.location.href= $($(this).parent()).attr('href');
+    });
+    var myGrid = new dhtmlXGridObject('gridDiv');
+    myGrid.setImagePath("/js/dhtmlx/codebase/imgs/");
+    myGrid.setHeader("<input type='checkbox' style='' onclick='chAll(this)'>,e-mail,Фио,Логин,Роль");
+    myGrid.setColumnIds("ch,email,fullName,login,role");
+    myGrid.setInitWidths("34,200,*,180,160");
+    myGrid.attachHeader(",#text_filter,#text_filter,#text_filter,#select_filter");
+    myGrid.enableResizing("false,true,true,true,true");
+    myGrid.setColTypes("ch,ro,ro,ro,ro");
+    myGrid.setColSorting("na,str,str,str,str");
+    myGrid.enableAutoWidth(true);
+    myGrid.init();
+    //myGrid.enableSmartRendering(true)
+    myGrid.load("/api/objects",'json');
+</script>

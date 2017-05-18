@@ -1,0 +1,370 @@
+<style type="text/css">
+    #divTab{
+        min-height:300px;
+        height:700px;
+    }
+</style>
+<div id='divTab' name='divTab'></div>
+<div id='formAddr' name='formAddr'></div>
+<script type="text/javascript" >
+/* global dhtmlXForm */
+/* global ymaps */
+/* global dhtmlXTabBar */
+/* global dhtmlXGridObject */
+/* global dhtmlx */
+
+function GetGrid(){
+    return {
+ head:[
+  {id:"sales",  width:50,  type:"dyn",  align:"right", sort:"int", value:"Sales"},
+  {id:"title",  width:150, type:"ed",   align:"left",  sort:"str", value:"Book Title"},
+  {id:"author", width:100, type:"ed",   align:"left",  sort:"str", value:"Author"},
+  {id:"price",  width:80,  type:"price", align:"right",  sort:"str", value:"Price"},
+  {id:"instore",  width:80, type:"ch",   align:"center", sort:"str", value:"In Store"},
+  {id:"shipping", width:80, type:"co",   align:"left",   sort:"str", value:"Shipping"}
+ ],
+ data:[
+    { 
+      id:1001, 
+      sales:"100",
+      title:"A Time to Kill",
+      author:"John Grisham",
+      price:"12.99",
+      instore:"1",
+      shipping:"05/01/1998"
+    },
+    {
+      id:1002, 
+      sales:"1000",
+      title:"Blood and Smoke",
+      author:"Stephen King",
+      price:"0",
+      instore:"1",
+      shipping:"01/01/2000"
+    },
+    {
+      id:1003, 
+      sales:"-200",
+      title:"The Rainmaker",
+      author:"John Grisham",
+      price:"7.99",
+      instore:"0",
+      shipping:"12/01/2001"
+    }
+ ]}
+
+}
+
+    function doYmap(name, value){
+    //    var f = this.getForm();
+        return '<div id="divMap" name="divMap" style="width:280px;height:210px;border:1px solid"></div>';    
+    }
+
+    var formAddr = [
+        {type: "block", inputWidth: "auto",  blockOffset: 1, className: 'wbutClass', offsetLeft: 5, list: [
+                {
+                    type: "block", inputWidth: "auto",  blockOffset: 1, className: 'wbutClass', offsetLeft: 5, list: [
+                        { type: "input", name: 'TITLE', label: 'Заголовок', value: '', readonly: false, inputWidth: 240, labelWidth: 70 },
+                        { type: "combo", name: 'TIPZD', label: 'Тип здания', value: '', readonly: false, inputWidth: 240, labelWidth: 70 },
+                        { type: "combo", name: 'KLASS', label: 'Класс', value: '', readonly: false, inputWidth: 240, labelWidth: 70 },
+                        {
+                            type:"container", 
+                            name:"myGrid", 
+                            label:"", 
+                            labelWidth: 0,
+                            inputWidth:310, 
+                            inputHeight:200
+                        },
+                    ]
+                },
+                
+                {type: "newcolumn", offset:20},
+                {
+                    type: "block", inputWidth: "auto",  blockOffset: 1, list: [
+                    { type: "input", name: 'map_autocomplete', label: '', value: '', readonly: false, inputWidth: 540, labelWidth: 1 },
+                    {
+                        type: "block", inputWidth: "auto",  blockOffset: 1, list: [
+                            { type: "input", name: 'GOROD',offsetLeft: -10, label: 'Город', value: '', readonly: false, inputWidth: 180, labelWidth: 70 },
+                            { type: "input", name: 'ULITCA', label: 'Улица', value: '', readonly: false, inputWidth: 180, labelWidth: 70 },
+                            { type: "input", name: 'METRO', label: 'Метро', value: '', readonly: false, inputWidth: 180, labelWidth: 70 },
+                            { type: "input", name: 'RAJON', label: 'Район', value: '', readonly: false, inputWidth: 180, labelWidth: 70 },
+                            { type: "input", name: 'OKRUG', label: 'Округ', value: '', readonly: false, inputWidth: 180, labelWidth: 70 },
+                            { type: "input", name: 'DOM', label: 'Дом', value: '', readonly: false, inputWidth: 180, labelWidth: 70 },
+                            {type: "newcolumn", offset:20},
+                            {type:"template",name:"a",label:"",labelWidth: 1,value:"",position:"label-left",format:doYmap}                
+                        ]
+                    },
+                    {
+                        type: "block",  blockOffset: 1, list: [
+                            { type: "input", name: 'CENAIN',offsetLeft: -10, label: 'Стоимость метра в год От', value: '', readonly: false, inputWidth: 70, labelWidth: 170 },
+                            {type: "newcolumn", offset:20},
+                            { type: "input", name: 'CENAIN',offsetLeft: -10, label: 'До', value: '', readonly: false, inputWidth: 70, labelWidth: 40 },
+            
+                        ]
+                    },            ]
+                },
+                {
+                    type: "block", inputWidth: "auto", className: 'wbutClass', offsetLeft: 5, list: [
+
+                    ]
+                }
+            ]
+        },
+        {
+            type:"container", 
+            name:"divSobst", 
+            label:"", 
+            labelWidth: 0,
+            inputWidth:800, 
+            inputHeight:300
+        },
+        
+        
+        
+    ];
+    
+var mapG = null;
+String.prototype.replaceAll = function(search, replace){
+  return this.split(search).join(replace);
+};
+
+$(function() {
+    ymaps.ready(function () {
+        $.ajax({
+            url: '/api/objects/10',
+            type: "GET",
+            contentType: 'application/json',
+            data: null,
+            //traditional: true,
+            success: function (data) {
+                if (data.result == "Error") {
+                    dhtmlx.alert(data.error.message);
+                    console.log('Получено--', data);
+                } else {
+                    var DOPFIELD = JSON.parse(data[0].DOPFIELD);
+                    var AjaxData = data[0];
+                    window['gridData'] = AjaxData;
+                    console.log(data);
+                    
+                    var myTabbar = new dhtmlXTabBar({
+                        parent:         "divTab",
+                        close_button:   false,
+                        tabs: [
+                            {id: "a1", text: "Адрес", active: true},
+                            {id: "a2", text: "Помещения"},
+                            {id: "a3", text: "Файлы", close: false} // tab w/o close button
+                        ]
+                    });
+                    window['formAddr']  =  myTabbar.tabs('a1').attachForm(formAddr);  //new dhtmlXForm("formAddr", formAddr); 
+                    window['formAddr'].setItemValue('TITLE',data[0].TITLE);
+                    window['formAddr'].setItemValue('map_autocomplete',DOPFIELD.map_autocomplete);
+                    var data = tipzd_;
+                    window['formAddr'].getCombo('TIPZD').clearAll();
+                    for(var i=0;i<data.length;i++){
+                        window['formAddr'].getCombo('TIPZD').addOption(data[i][1].toString(),data[i][1].toString(),'');
+                    }
+                    var data = klass_;
+                    window['formAddr'].getCombo('KLASS').clearAll();
+                    for(var i=0;i<data.length;i++){
+                        window['formAddr'].getCombo('KLASS').addOption(data[i][1].toString(),data[i][1].toString(),'');
+                    }
+
+                    
+                    var sobstTab = new dhtmlXTabBar(window['formAddr'].getContainer("divSobst"));
+                    sobstTab.addTab(
+                        "a1",       // id
+                        "Собс. адреса",    // tab text
+                        null,       // auto width
+                        null,       // last position
+                        false,      // inactive
+                        false       // disable close button <-- this one
+                    );    
+                    
+                    var gridSobst = sobstTab.tabs('a1').attachGrid();
+                    gridSobst.setImagePath("js/dhtmlx/codebase/imgs/");
+        			gridSobst.setHeader("&nbsp;,Собственник,dataOld");
+        			gridSobst.setInitWidths("30,*");
+        			gridSobst.setColAlign("left,left,left");
+        			gridSobst.setColTypes("sub_row,ro,ro");
+        			//gridSobst.setColSorting("str,str");                    
+                    gridSobst.setColumnIds("col0,col1,col3");
+        			gridSobst.setNoHeader(true);
+                    gridSobst.init();        
+                    gridSobst.setColumnHidden(2,true); 
+                    var dataGrid= {"total_count":50000, "pos":0, "data":[]};
+                    for(var prop in AjaxData.SOBST){
+                        var sfield ='';
+                        sfield +='<table>';
+                        for(var prop1 in AjaxData.SOBST[prop]){
+                            if(prop1!='Наименование' && AjaxData.SOBST[prop][prop1]!=''){
+                                sfield +='<tr>';
+                                sfield +='<td>'+prop1+'</td>';
+                                sfield +='<td>'+AjaxData.SOBST[prop][prop1]+'</td>';
+                                sfield +='</tr>';
+                            }
+                        }
+/*
+                        sfield +='<tr>';
+                        sfield +='<td>Комментарий</td>';
+                        sfield +='<td>';
+                        sfield +=AjaxData.SOBST[prop]['Комментарий'];
+                        sfield +='</td>';
+                        sfield +='</tr>';
+*/                        
+                        sfield +='</table>';
+                        dataGrid.data.push({
+                            col0:'1111',
+                            col1:AjaxData.SOBST[prop]['Наименование'],
+                            col3:prop
+                        });
+                    }                    
+                    gridSobst.parse(dataGrid,"js");
+                    gridSobst.attachEvent("onSubRowOpen", function(id,state){
+                        // создание карточки собственика
+                        $.get('/js/form/sobst_small.html',function(data){
+                            gridSobst.cells(id, 0).setContent(data);
+                        })
+                    });
+
+/*                    
+                    gridSobst.attachEvent("onSubRowOpen", function(id,state){
+                        var cellObj = gridSobst.cells(id, 2).getValue();
+                        console.log(cellObj);
+                        gridSobst.cells(id, 0).setValue('fffff');
+                    });
+
+gridSobst.attachEvent("onSubGridCreated",function(subgrid){
+    subgrid.setHeader("A,B,C");
+    subgrid.setColTypes("ro,ro,ro");
+    subgrid.setInitWidths("100,100,100");
+    subgrid.init();
+    //subgrid.load("data.xml");
+    return false;  // block default behavior
+});      
+*/
+                    sobstTab.addTab(
+                        "a2",       // id
+                        "Собс. площадей",    // tab text
+                        null,       // auto width
+                        null,       // last position
+                        false,      // inactive
+                        false       // disable close button <-- this one
+                    );                    
+                    sobstTab.tabs('a1').setActive();
+                    
+                    
+                    var grid = new dhtmlXGridObject(window['formAddr'].getContainer("myGrid"));
+                    var dataGrid= {"total_count":50000, "pos":0, "data":[
+                      { "col1": "<a href='#'>Охрана</a>",
+                        "col2": DOPFIELD.OHR.replaceAll(';',' ;'),
+                        "col3": "100"
+                      },
+                      { "col1": "<a href='#'>Вход</a>",
+                        "col2": DOPFIELD.VHOD.replaceAll(';',' ;'),
+                        "col3": "1000"
+                      },
+                      { "col1": "<a href='#'>ЭТАЖ</a>",
+                        "col2": DOPFIELD.ETAG.replaceAll(';',' ;'),
+                        "col3": "-200"
+                      },
+                      { "col1": "<a href='#'>Доп. поля</a>",
+                        "col2": DOPFIELD.DOPINFO.replaceAll(';',' ;'),
+                        "col3": "-200"
+                      }
+                    ]};
+
+
+                    grid.setImagePath("js/dhtmlx/codebase/imgs/");
+        			grid.setHeader("Sales, Book Title, Author");
+        			grid.setNoHeader(true);
+        			grid.setInitWidths("90,40,*");
+        			
+        			grid.setColAlign("left,left,left");
+        			grid.setColTypes("ro,ro,ro");
+        			grid.setColSorting("str,str,str");                    
+                    
+                    grid.setColumnIds("col1,colB,col2");
+                    grid.enableMultiline(true);
+                    grid.splitAt(2);
+                    grid.init();
+                    grid.parse(dataGrid,"js");
+                    
+                    mapG = new ymaps.Map('divMap', {
+                        center: [55.76, 37.64],
+                        zoom: 16,
+                        controls: []
+                    });
+                    mapG.events.add('actionend',function(e){
+                        var v = mapG.getCenter();
+                        ymaps.geocode(v,{kind: 'street'}).then(
+                            function (res) {
+                                var street = res.geoObjects.get(0);
+                                var name = street.properties.get('name');
+                                window['formAddr'].setItemValue('ULITCA',name);
+                                //alert(name);
+                            }
+                        );
+                        ymaps.geocode(v,{kind: 'metro'}).then(
+                            function (res) {
+                                var street = res.geoObjects.get(0);
+                                var name = street.properties.get('name').replace('метро ','');
+                                window['formAddr'].setItemValue('METRO',name);
+                                //alert(name);
+                            }
+                        );
+                        ymaps.geocode(v,{kind: 'district'}).then(
+                            function (res) {
+                                var street = res.geoObjects.get(0);
+                                var name = street.properties.get('name');
+                                window['formAddr'].setItemValue('RAJON',name);
+                                //alert(name);
+                            }
+                        );
+                        ymaps.geocode(v,{kind: 'province'}).then(
+                            function (res) {
+                                var street = res.geoObjects.get(0);
+                                var name = street.properties.get('name');
+                                window['formAddr'].setItemValue('OKRUG',name);
+                                //alert(name);
+                            }
+                        );
+                        ymaps.geocode(v,{kind: 'locality'}).then(
+                            function (res) {
+                                var street = res.geoObjects.get(0);
+                                var name = street.properties.get('name');
+                                window['formAddr'].setItemValue('GOROD',name);
+                                //alert(name);
+                            }
+                        );
+                        ymaps.geocode(v,{kind: 'house'}).then(
+                            function (res) {
+                                var street = res.geoObjects.get(0);
+                                var name = street.properties.get('name');
+                                var p = name.split(',');
+                                window['formAddr'].setItemValue('DOM',p[1].trim());
+                            }
+                        );
+                        mapG.geoObjects.removeAll();
+                        var myGeoObject = new ymaps.GeoObject({
+                            geometry: {
+                                type: "Point",
+                                coordinates: v
+                            },
+                            properties: {
+                            }
+                        }, {
+                            preset: 'islands#blackStretchyIcon',
+                            draggable: false
+                        });
+                        mapG.geoObjects.add(myGeoObject);            
+                    });
+                    console.log(AjaxData);
+                    mapG.setCenter([AjaxData.LAT, AjaxData.LNG], 16, {
+                        checkZoomRange: true
+                    });
+                }
+            }
+        });
+    }); 
+});
+</script>
