@@ -9,7 +9,7 @@ var YANDEX_CLIENT_SECRET = "813b905e05b644d78bada3cf37293698";
 
 var db = mysql.createConnection({
   host     : 'localhost',
-  user     : 'root',
+  user     : 'sl',
   password : '5895472lis',
   database : 'c9'
 });
@@ -83,7 +83,7 @@ db.query('SELECT `title` FROM `posts` WHERE `id` = 10', function(err, rows, fiel
 */
     var db = mysql.createConnection({
       host     : 'localhost',
-      user     : 'root',
+      user     : 'sl',
       password : '5895472lis',
       database : 'c9'
     });

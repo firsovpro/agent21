@@ -60,8 +60,8 @@ function reinit(){
                 } else {
                     GlobalUser = data.user;
                     if(GlobalUser==undefined){
-                        dhtmlx.alert('<a href="/auth/yandex">Login with Yandex</a>');
-                        return;
+                        //dhtmlx.alert('<a href="/auth/yandex">Login with Yandex</a>');
+                        //return;
                     }
                     console.log('GlobalUser', GlobalUser);
                 }
